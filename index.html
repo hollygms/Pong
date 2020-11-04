@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<header>
+      <title>Ping Pong! You are Wrong</title>
+</header>
+
+<body>
+    <canvas id='gameCanvas' width="600" height="400"></canvas>
+
+    <script>
+
+    var canvas;
+    var canvasConext;
+
+    window.onload = function() {
+        canvas = document.getElementById('gameCanvas');
+        canvasContext = canvas.getContext('2d');
+
+        document.addEventListener('keydown', keyPressed);
+        document.addEventListener('keyup', keyReleased);
+
+        setInterval(mainLoop, 100/50);
+
+    }
+    //ball info
+    var ballXpos = 0;
+    var ballYpos = 0;
+    var ballXspeed = 0.8;
+    var ballYspeed = 1;
+    const ballSize = 10;
+
+    //paddle AI info
+    const pAIXpos = 10;
+    var pAIYpos = 125;
+    const pAIWidth = 10;
+    const pAIHeight = 100;
+    var pAIYspeed = 0.7;
+
+    //playerPaddle info
+    const pPaddleXpos = 600 - 10 * 2;
+    var pPaddleYpos = 0;
+    const pPaddleWidth = 10;
+    const pPaddleHeight = 100;
+    var pPaddleYspeed = 0.7;
+
+    //playPaddle keypressing
+    const UP_ARROW_KEY = 38;
+    const DOWN_ARROW_KEY = 40;
+    var upArrowKeyPressed = false;
+    var downArrowKeyPressed = false;
+
+
+    var startingPos = true; //toggle starting positions
+
+    var playerScore = 0;
+    var aiScore = 0;
+
+//* Add HERE TO USE
+
+    function mainLoop(){
+        colorRect(0, 0, canvas.width, canvas.height, 'black') //background
+        colorRect(ballXpos, ballYpos, ballSize, ballSize, 'white') //ball
+        colorRect(pAIXpos,pAIYpos, pAIWidth, pAIHeight, 'white') //paddleAI
+        colorRect(pPaddleXpos, pPaddleYpos, pPaddleWidth, pPaddleHeight, 'white') //player paddle
+
+        drawText(20, 10, 'white', 'AI Score: ' + aiScore); //ai score
+        drawText(canvas.width - 100,10,'white','Player Score: ' + playerScore); //player score
+
+        if(startingPos){
+            startPos();
+            startingPos = false;
+        }
+
+        ballMove();
+        paddleAIMove();
+        paddlePlayerMove();
+    };
+//*UP ABOVE IS MAINLOOP
+
+
+    function keyPressed(evt){
+        if(evt.keyCode == UP_ARROW_KEY){
+            upArrowKeyPressed = true;
+        }
+        if(evt.keyCode == DOWN_ARROW_KEY){
+            downArrowKeyPressed = true;
+        }
+    };
+
+    function keyReleased(evt){
+        if(evt.keyCode == UP_ARROW_KEY){
+            upArrowKeyPressed = false;
+        }
+        if(evt.keyCode == DOWN_ARROW_KEY){
+            downArrowKeyPressed = false;
+        }
+    };
+
+    function ballMove(){
+        ballXpos += ballXspeed;
+        ballYpos += ballYspeed;
+
+        if (ballYpos > pAIYpos - ballSize && ballYpos < pAIYpos + pAIHeight && ballXpos < pAIXpos + pAIWidth){
+            ballXspeed *= -1;
+        }
+
+        if (ballYpos > pPaddleYpos - ballSize && ballYpos < pPaddleYpos + pPaddleHeight && ballXpos > pPaddleXpos - ballSize){
+            ballXspeed *= -1;
+        }
+
+        if (ballXpos > canvas.width - ballSize){
+            ballXspeed *= -1;
+            startingPos = true;
+            aiScore++;
+        }
+
+        if (ballXpos < 0){
+            ballXspeed *= -1;
+            startingPos = true;
+            playerScore++;
+        }
+
+        if ((ballYpos > canvas.height - ballSize) || (ballYpos < 0)){
+            ballYspeed *= -1;
+        }
+    };
+
+    function startPos(){
+        ballXpos = canvas.width / 2 - ballSize / 2;
+        ballYpos = canvas.height / 2 - ballSize / 2;
+        pPaddleYpos = ballYpos - pPaddleHeight / 2;
+    };
+
+    function paddleAIMove(){
+        if (ballYpos < pAIYpos){
+            pAIYpos -= pAIYspeed
+        }
+        if (ballYpos > pAIYpos + pAIHeight){
+            pAIYpos += pAIYspeed
+        }
+    };
+
+    function paddlePlayerMove(){
+        if (upArrowKeyPressed){
+            pPaddleYpos -= pPaddleYspeed
+        }
+        if (downArrowKeyPressed){
+            pPaddleYpos += pPaddleYspeed
+        }
+    };
+
+    function colorRect(x, y, w, h, color){
+        canvasContext.fillStyle = color;
+        canvasContext.fillRect(x, y, w, h);
+    }
+
+    function drawText(x, y, color, msg){
+        canvasContext.fillStyle = color;
+        canvasContext.fillText(msg, x, y);
+    }
+
+    </script>
+
+</body>
+
+</html>
